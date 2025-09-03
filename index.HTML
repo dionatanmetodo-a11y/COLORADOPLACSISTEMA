@@ -71,6 +71,21 @@
     .pdf-button:hover {
       background: #28a745;
     }
+
+    .clear-button {
+      margin-top: 10px;
+      background: #d9534f;
+      color: white;
+      font-weight: bold;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      max-width: 200px;
+    }
+
+    .clear-button:hover {
+      background: #c9302c;
+    }
   </style>
 </head>
 <body>
@@ -145,13 +160,14 @@
       <tbody></tbody>
     </table>
 
-    <!-- Botão PDF -->
+    <!-- Botões -->
     <button class="pdf-button" onclick="gerarPDF()">Gerar PDF</button>
+    <button class="clear-button" onclick="limparPlanilha()">Limpar Planilha</button>
   </div>
 
   <script>
-    const cidades = [];
-    const vendas = [];
+    let cidades = [];
+    let vendas = [];
 
     // Popula o select quantidade com valores de 1 a 50
     const selectQtd = document.getElementById('quantidade');
@@ -160,6 +176,23 @@
       option.value = i;
       option.textContent = i;
       selectQtd.appendChild(option);
+    }
+
+    // ---- Funções de persistência ----
+    function salvarLocal() {
+      localStorage.setItem("cidades", JSON.stringify(cidades));
+      localStorage.setItem("vendas", JSON.stringify(vendas));
+    }
+
+    function carregarLocal() {
+      const cidadesSalvas = localStorage.getItem("cidades");
+      const vendasSalvas = localStorage.getItem("vendas");
+
+      if (cidadesSalvas) cidades = JSON.parse(cidadesSalvas);
+      if (vendasSalvas) vendas = JSON.parse(vendasSalvas);
+
+      atualizarCidades();
+      atualizarTabela();
     }
 
     function adicionarCidade() {
@@ -178,6 +211,7 @@
       }
 
       cidades.push(nome);
+      salvarLocal();
       atualizarCidades();
       document.getElementById('cidade').value = '';
       msg.innerText = 'Cidade adicionada com sucesso!';
@@ -211,17 +245,10 @@
         return;
       }
 
-      const venda = {
-        cidade,
-        cliente,
-        item,
-        quantidade,
-        valor,
-        forma,
-        pontos
-      };
+      const venda = { cidade, cliente, item, quantidade, valor, forma, pontos };
 
       vendas.push(venda);
+      salvarLocal();
       atualizarTabela();
 
       // Limpar campos
@@ -281,6 +308,22 @@
 
       doc.save("vendas.pdf");
     }
+
+    // Função para limpar tudo
+    function limparPlanilha() {
+      if (confirm("Tem certeza que deseja limpar TODAS as cidades e vendas?")) {
+        cidades = [];
+        vendas = [];
+        localStorage.removeItem("cidades");
+        localStorage.removeItem("vendas");
+        atualizarCidades();
+        atualizarTabela();
+        alert("Planilha limpa com sucesso!");
+      }
+    }
+
+    // carregar dados salvos ao abrir a página
+    window.onload = carregarLocal;
   </script>
 </body>
 </html>
