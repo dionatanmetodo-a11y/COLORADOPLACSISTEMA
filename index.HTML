@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Controle de Vendas - Placas, Lixeiras e Bancos</title>
+  <!-- Bibliotecas jsPDF e autoTable -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 30px;
+      background: #f4f4f4;
+    }
+
+    h1, h2 {
+      color: #333;
+    }
+
+    .section {
+      background: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+
+    input, select, button, textarea {
+      padding: 8px;
+      margin-top: 5px;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+
+    table, th, td {
+      border: 1px solid #ccc;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: left;
+    }
+
+    .success {
+      color: green;
+      margin-top: 10px;
+    }
+
+    .pdf-button {
+      margin-top: 15px;
+      background: #2c7;
+      color: white;
+      font-weight: bold;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      max-width: 200px;
+    }
+
+    .pdf-button:hover {
+      background: #28a745;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Controle de Vendas - Placas, Lixeiras e Bancos</h1>
+
+  <!-- Adicionar Cidade -->
+  <div class="section">
+    <h2>Adicionar Cidade</h2>
+    <label for="cidade">Nome da Cidade:</label>
+    <input type="text" id="cidade" placeholder="Ex: Porto Alegre" />
+    <button onclick="adicionarCidade()">Adicionar Cidade</button>
+    <div id="cidadeMsg" class="success"></div>
+  </div>
+
+  <!-- Registrar Venda -->
+  <div class="section">
+    <h2>Registrar Venda</h2>
+
+    <label for="cidadeVenda">Cidade:</label>
+    <select id="cidadeVenda"></select>
+
+    <label for="cliente">Nome do Cliente:</label>
+    <input type="text" id="cliente" placeholder="Ex: João da Loja XYZ" />
+
+    <label for="item">Item Vendido:</label>
+    <select id="item">
+      <option value="">-- Selecione o item --</option>
+      <option value="Placa">Placa</option>
+      <option value="Lixeira">Lixeira</option>
+      <option value="Banco">Banco</option>
+    </select>
+
+    <label for="quantidade">Quantidade:</label>
+    <select id="quantidade">
+      <option value="">-- Selecione a quantidade --</option>
+    </select>
+
+    <label for="valor">Valor Total (R$):</label>
+    <input type="number" id="valor" placeholder="Ex: 450.00" min="0" step="0.01" />
+
+    <label for="forma">Forma de Pagamento:</label>
+    <select id="forma">
+      <option value="Pix">Pix</option>
+      <option value="Dinheiro">Dinheiro</option>
+      <option value="Boleto">Boleto</option>
+      <option value="Cartão">Cartão</option>
+    </select>
+
+    <label for="pontos">Pontos de Instalação:</label>
+    <textarea id="pontos" placeholder="Ex: Praça Central, Escola Municipal, Rua das Flores" rows="3"></textarea>
+
+    <button onclick="registrarVenda()">Salvar Venda</button>
+    <div id="vendaMsg" class="success"></div>
+  </div>
+
+  <!-- Vendas Registradas -->
+  <div class="section">
+    <h2>Vendas Registradas</h2>
+    <table id="tabelaVendas">
+      <thead>
+        <tr>
+          <th>Cidade</th>
+          <th>Cliente</th>
+          <th>Item</th>
+          <th>Qtd</th>
+          <th>Valor (R$)</th>
+          <th>Forma</th>
+          <th>Pontos de Instalação</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <!-- Botão PDF -->
+    <button class="pdf-button" onclick="gerarPDF()">Gerar PDF</button>
+  </div>
+
+  <script>
+    const cidades = [];
+    const vendas = [];
+
+    // Popula o select quantidade com valores de 1 a 50
+    const selectQtd = document.getElementById('quantidade');
+    for(let i=1; i<=50; i++) {
+      const option = document.createElement('option');
+      option.value = i;
+      option.textContent = i;
+      selectQtd.appendChild(option);
+    }
+
+    function adicionarCidade() {
+      const nome = document.getElementById('cidade').value.trim();
+      const msg = document.getElementById('cidadeMsg');
+      msg.innerText = '';
+
+      if (nome === '') {
+        alert("Digite o nome da cidade.");
+        return;
+      }
+
+      if (cidades.includes(nome)) {
+        alert("Cidade já cadastrada.");
+        return;
+      }
+
+      cidades.push(nome);
+      atualizarCidades();
+      document.getElementById('cidade').value = '';
+      msg.innerText = 'Cidade adicionada com sucesso!';
+    }
+
+    function atualizarCidades() {
+      const select = document.getElementById('cidadeVenda');
+      select.innerHTML = '';
+
+      cidades.forEach(cidade => {
+        const option = document.createElement('option');
+        option.value = cidade;
+        option.textContent = cidade;
+        select.appendChild(option);
+      });
+    }
+
+    function registrarVenda() {
+      const cidade = document.getElementById('cidadeVenda').value;
+      const cliente = document.getElementById('cliente').value.trim();
+      const item = document.getElementById('item').value;
+      const quantidade = parseInt(document.getElementById('quantidade').value);
+      const valor = parseFloat(document.getElementById('valor').value);
+      const forma = document.getElementById('forma').value;
+      const pontos = document.getElementById('pontos').value.trim();
+      const msg = document.getElementById('vendaMsg');
+      msg.innerText = '';
+
+      if (!cidade || !cliente || !item || isNaN(quantidade) || quantidade <= 0 || isNaN(valor) || valor <= 0 || !pontos) {
+        alert("Preencha todos os campos corretamente.");
+        return;
+      }
+
+      const venda = {
+        cidade,
+        cliente,
+        item,
+        quantidade,
+        valor,
+        forma,
+        pontos
+      };
+
+      vendas.push(venda);
+      atualizarTabela();
+
+      // Limpar campos
+      document.getElementById('cliente').value = '';
+      document.getElementById('item').value = '';
+      document.getElementById('quantidade').value = '';
+      document.getElementById('valor').value = '';
+      document.getElementById('pontos').value = '';
+      msg.innerText = 'Venda registrada com sucesso!';
+    }
+
+    function atualizarTabela() {
+      const tbody = document.getElementById('tabelaVendas').querySelector('tbody');
+      tbody.innerHTML = '';
+
+      vendas.forEach(venda => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${venda.cidade}</td>
+          <td>${venda.cliente}</td>
+          <td>${venda.item}</td>
+          <td>${venda.quantidade}</td>
+          <td>${venda.valor.toFixed(2)}</td>
+          <td>${venda.forma}</td>
+          <td>${venda.pontos}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Função para gerar PDF
+    function gerarPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      doc.setFontSize(14);
+      doc.text("Relatório de Vendas", 14, 15);
+
+      const colunas = ["Cidade", "Cliente", "Item", "Qtd", "Valor (R$)", "Forma", "Pontos"];
+      const linhas = vendas.map(v => [
+        v.cidade,
+        v.cliente,
+        v.item,
+        v.quantidade,
+        v.valor.toFixed(2),
+        v.forma,
+        v.pontos
+      ]);
+
+      doc.autoTable({
+        head: [colunas],
+        body: linhas,
+        startY: 20,
+        styles: { fontSize: 10 },
+        headStyles: { fillColor: [52, 58, 64] }
+      });
+
+      doc.save("vendas.pdf");
+    }
+  </script>
+</body>
+</html>
