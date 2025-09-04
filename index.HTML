@@ -2,111 +2,40 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>COLORADO PLAC</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <title>Colorado Plac</title>
   <!-- Bibliotecas jsPDF e autoTable -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Poppins', sans-serif;
-    }
-
     body {
-      background: #f0f6ff; /* fundo azul clarinho */
-      padding: 100px 20px 40px;
+      font-family: Arial, sans-serif;
+      margin: 30px;
+      background: #add8e6; /* azul claro */
     }
 
-    /* Header fixo */
-    header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      background: linear-gradient(90deg, #0056b3, #007BFF);
-      color: white;
-      padding: 20px;
-      text-align: center;
-      font-size: 22px;
-      font-weight: 600;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-      z-index: 1000;
-    }
-
-    /* Container das seções */
-    .container {
-      max-width: 1000px;
-      margin: auto;
-    }
-
+    /* Caixas principais */
     .section {
-      background: white;
-      padding: 25px;
-      margin-bottom: 25px;
-      border-radius: 15px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      transition: transform 0.2s;
+      background: rgba(255, 255, 255, 0.9); /* branco translúcido */
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
 
-    .section:hover {
-      transform: translateY(-3px);
-    }
-
-    h2 {
-      margin-bottom: 15px;
-      color: #0056b3;
-      font-size: 20px;
-      border-left: 5px solid #007BFF;
-      padding-left: 10px;
+    h1, h2 {
+      color: #333;
     }
 
     label {
       display: block;
-      margin-top: 12px;
-      font-weight: 500;
-    }
-
-    input, select, textarea {
-      padding: 10px;
-      margin-top: 6px;
-      width: 100%;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      transition: border 0.2s;
-    }
-
-    input:focus, select:focus, textarea:focus {
-      border-color: #007BFF;
-      outline: none;
-    }
-
-    /* Botões modernos */
-    button {
-      background: linear-gradient(90deg, #007BFF, #0056b3);
-      color: white;
-      font-weight: 600;
-      border: none;
-      padding: 12px 20px;
-      cursor: pointer;
-      border-radius: 8px;
-      transition: transform 0.2s, opacity 0.2s;
-      margin-top: 15px;
-    }
-
-    button:hover {
-      transform: scale(1.05);
-      opacity: 0.9;
-    }
-
-    /* Mensagens de sucesso */
-    .success {
-      color: green;
       margin-top: 10px;
-      font-size: 14px;
-      font-weight: 500;
+    }
+
+    input, select, button, textarea {
+      padding: 8px;
+      margin-top: 5px;
+      width: 100%;
+      max-width: 500px;
     }
 
     /* Estilo da tabela */
@@ -115,124 +44,132 @@
       border-collapse: collapse;
       margin-top: 15px;
       background: white;
-      border-radius: 10px;
+      border-radius: 8px;
       overflow: hidden;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
 
     table thead {
-      background: #007BFF;
+      background: #007BFF; /* azul */
       color: white;
     }
 
     table th, table td {
-      padding: 14px;
+      padding: 12px;
       text-align: left;
-      border: 1px solid #eee;
+      border: 1px solid #ddd;
     }
 
     table tbody tr:nth-child(even) {
-      background: #f8fbff;
+      background: #e6f2ff;
+    }
+
+    table tbody tr:nth-child(odd) {
+      background: #ffffff;
     }
 
     table tbody tr:hover {
-      background: #e1efff;
+      background: #cce5ff;
     }
 
-    /* Responsividade */
-    @media (max-width: 768px) {
-      body {
-        padding: 120px 10px 20px;
-      }
+    .success {
+      color: green;
+      margin-top: 10px;
+    }
 
-      .section {
-        padding: 15px;
-      }
+    /* Botões azuis */
+    button, .pdf-button, .clear-button {
+      background: #007BFF;
+      color: white;
+      font-weight: bold;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: background 0.3s;
+      max-width: 200px;
+    }
 
-      table th, table td {
-        padding: 10px;
-        font-size: 14px;
-      }
+    button:hover, .pdf-button:hover, .clear-button:hover {
+      background: #0056b3;
     }
   </style>
 </head>
 <body>
 
-  <header>📊 Controle de Vendas</header>
+  <h1>📊 Colorado Plac</h1>
 
-  <div class="container">
-    <!-- Adicionar Cidade -->
-    <div class="section">
-      <h2>Adicionar Cidade</h2>
-      <label for="cidade">Nome da Cidade:</label>
-      <input type="text" id="cidade" placeholder="Ex: Porto Alegre" />
-      <button onclick="adicionarCidade()">Adicionar Cidade</button>
-      <div id="cidadeMsg" class="success"></div>
-    </div>
+  <!-- Adicionar Cidade -->
+  <div class="section">
+    <h2>Adicionar Cidade</h2>
+    <label for="cidade">Nome da Cidade:</label>
+    <input type="text" id="cidade" placeholder="Ex: Porto Alegre" />
+    <button onclick="adicionarCidade()">Adicionar Cidade</button>
+    <div id="cidadeMsg" class="success"></div>
+  </div>
 
-    <!-- Registrar Venda -->
-    <div class="section">
-      <h2>Registrar Venda</h2>
+  <!-- Registrar Venda -->
+  <div class="section">
+    <h2>Registrar Venda</h2>
 
-      <label for="cidadeVenda">Cidade:</label>
-      <select id="cidadeVenda"></select>
+    <label for="cidadeVenda">Cidade:</label>
+    <select id="cidadeVenda"></select>
 
-      <label for="cliente">Nome do Cliente:</label>
-      <input type="text" id="cliente" placeholder="Ex: João da Loja XYZ" />
+    <label for="cliente">Nome do Cliente:</label>
+    <input type="text" id="cliente" placeholder="Ex: João da Loja XYZ" />
 
-      <label for="item">Item Vendido:</label>
-      <select id="item">
-        <option value="">-- Selecione o item --</option>
-        <option value="Placa">Placa</option>
-        <option value="Lixeira">Lixeira</option>
-        <option value="Banco">Banco</option>
-      </select>
+    <label for="item">Item Vendido:</label>
+    <select id="item">
+      <option value="">-- Selecione o item --</option>
+      <option value="Placa">Placa</option>
+      <option value="Lixeira">Lixeira</option>
+      <option value="Banco">Banco</option>
+    </select>
 
-      <label for="quantidade">Quantidade:</label>
-      <select id="quantidade">
-        <option value="">-- Selecione a quantidade --</option>
-      </select>
+    <label for="quantidade">Quantidade:</label>
+    <select id="quantidade">
+      <option value="">-- Selecione a quantidade --</option>
+    </select>
 
-      <label for="valor">Valor Total (R$):</label>
-      <input type="number" id="valor" placeholder="Ex: 450.00" min="0" step="0.01" />
+    <label for="valor">Valor Total (R$):</label>
+    <input type="number" id="valor" placeholder="Ex: 450.00" min="0" step="0.01" />
 
-      <label for="forma">Forma de Pagamento:</label>
-      <select id="forma">
-        <option value="Pix">Pix</option>
-        <option value="Dinheiro">Dinheiro</option>
-        <option value="Boleto">Boleto</option>
-        <option value="Cartão">Cartão</option>
-      </select>
+    <label for="forma">Forma de Pagamento:</label>
+    <select id="forma">
+      <option value="Pix">Pix</option>
+      <option value="Dinheiro">Dinheiro</option>
+      <option value="Boleto">Boleto</option>
+      <option value="Cartão">Cartão</option>
+    </select>
 
-      <label for="pontos">Pontos de Instalação:</label>
-      <textarea id="pontos" placeholder="Ex: Praça Central, Escola Municipal, Rua das Flores" rows="3"></textarea>
+    <label for="pontos">Pontos de Instalação:</label>
+    <textarea id="pontos" placeholder="Ex: Praça Central, Escola Municipal, Rua das Flores" rows="3"></textarea>
 
-      <button onclick="registrarVenda()">💾 Salvar Venda</button>
-      <div id="vendaMsg" class="success"></div>
-    </div>
+    <button onclick="registrarVenda()">Salvar Venda</button>
+    <div id="vendaMsg" class="success"></div>
+  </div>
 
-    <!-- Vendas Registradas -->
-    <div class="section">
-      <h2>Vendas Registradas</h2>
-      <table id="tabelaVendas">
-        <thead>
-          <tr>
-            <th>Cidade</th>
-            <th>Cliente</th>
-            <th>Item</th>
-            <th>Qtd</th>
-            <th>Valor (R$)</th>
-            <th>Forma</th>
-            <th>Pontos de Instalação</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+  <!-- Vendas Registradas -->
+  <div class="section">
+    <h2>Vendas Registradas</h2>
+    <table id="tabelaVendas">
+      <thead>
+        <tr>
+          <th>Cidade</th>
+          <th>Cliente</th>
+          <th>Item</th>
+          <th>Qtd</th>
+          <th>Valor (R$)</th>
+          <th>Forma</th>
+          <th>Pontos de Instalação</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
 
-      <!-- Botões -->
-      <button onclick="gerarPDF()">📄 Gerar PDF</button>
-      <button onclick="limparPlanilha()">🗑️ Limpar Planilha</button>
-    </div>
+    <!-- Botões -->
+    <button class="pdf-button" onclick="gerarPDF()">Gerar PDF</button>
+    <button class="clear-button" onclick="limparPlanilha()">Limpar Planilha</button>
   </div>
 
   <script>
@@ -355,7 +292,7 @@
       const doc = new jsPDF();
 
       doc.setFontSize(14);
-      doc.text("Relatório de Vendas", 14, 15);
+      doc.text("Relatório de Vendas - Colorado Plac", 14, 15);
 
       const colunas = ["Cidade", "Cliente", "Item", "Qtd", "Valor (R$)", "Forma", "Pontos"];
       const linhas = vendas.map(v => [
@@ -376,7 +313,7 @@
         headStyles: { fillColor: [52, 58, 64] }
       });
 
-      doc.save("vendas.pdf");
+      doc.save("vendas_ColoradoPlac.pdf");
     }
 
     // Função para limpar tudo
@@ -397,4 +334,3 @@
   </script>
 </body>
 </html>
-
